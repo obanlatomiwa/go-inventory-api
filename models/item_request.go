@@ -4,8 +4,8 @@ import "github.com/go-playground/validator/v10"
 
 type ItemRequest struct {
 	Name     string  `json:"name" validate:"required"`
-	Price    float64 `json:"price" validate:"required, gt=0"`
-	Quantity int64   `json:"quantity" validate:"required, gte=0"`
+	Price    float64 `json:"price" validate:"required,gt=0"`
+	Quantity int64   `json:"quantity" validate:"required,gte=0"`
 }
 
 func (itemInput ItemRequest) ValidateItemRequest() []*ErrorResponse {
