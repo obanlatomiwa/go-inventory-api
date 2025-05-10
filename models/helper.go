@@ -13,6 +13,12 @@ func getErrorMessage(err validator.FieldError) string {
 	case "gte":
 		return "The value of " + err.Field() + " must be greater than or equals" + err.Param()
 
+	case "email":
+		return "The value of " + err.Field() + " must be a valid email address"
+
+	case "min":
+		return "The minimum length of " + err.Field() + " is equals " + err.Param()
+
 	default:
 		return "Validation error in" + err.Field()
 	}

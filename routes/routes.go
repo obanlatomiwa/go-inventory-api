@@ -6,6 +6,10 @@ import (
 )
 
 func SetUpRoutes(app *fiber.App) {
+	// register auth handlers
+	app.Post("/api/v1/signup", handlers.SignUp)
+	app.Post("/api/v1/login", handlers.Login)
+
 	app.Get("/api/v1/items", handlers.GetAllItems)
 	app.Get("/api/v1/items/:id", handlers.GetItemById)
 	app.Post("/api/v1/items", handlers.CreateItem)
