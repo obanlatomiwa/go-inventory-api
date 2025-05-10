@@ -9,11 +9,11 @@ import (
 
 var storage []models.Item
 
-func getAllItems() []models.Item {
+func GetAllItems() []models.Item {
 	return storage
 }
 
-func getItemById(id string) (models.Item, error) {
+func GetItemById(id string) (models.Item, error) {
 	for _, item := range storage {
 		if item.ID == id {
 			return item, nil
@@ -22,7 +22,7 @@ func getItemById(id string) (models.Item, error) {
 	return models.Item{}, errors.New("Item not found")
 }
 
-func createItem(itemRequest models.ItemRequest) models.Item {
+func CreateItem(itemRequest models.ItemRequest) models.Item {
 	newItem := models.Item{
 		ID:        uuid.New().String(),
 		Name:      itemRequest.Name,
@@ -36,7 +36,7 @@ func createItem(itemRequest models.ItemRequest) models.Item {
 	return newItem
 }
 
-func updateItem(itemRequest models.ItemRequest, id string) (models.Item, error) {
+func UpdateItem(itemRequest models.ItemRequest, id string) (models.Item, error) {
 
 	for index, item := range storage {
 		if item.ID == id {
@@ -52,7 +52,7 @@ func updateItem(itemRequest models.ItemRequest, id string) (models.Item, error) 
 	return models.Item{}, errors.New("Item update failed, Item not found")
 }
 
-func deleteItemById(id string) bool {
+func DeleteItemById(id string) bool {
 	for index, item := range storage {
 		if item.ID == id {
 			storage = append(storage[:index], storage[index+1:]...)
