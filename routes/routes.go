@@ -3,16 +3,21 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/obanlatomiwa/go-inventory-api/handlers"
+	"github.com/obanlatomiwa/go-inventory-api/middlewares"
 )
 
 func SetUpRoutes(app *fiber.App) {
-	// register auth handlers
-	app.Post("/api/v1/signup", handlers.SignUp)
-	app.Post("/api/v1/login", handlers.Login)
+	// public routes
+	var publicRoutes fiber.Router = app.Group("/api/v1")
+	publicRoutes.Post("/signup", handlers.SignUp)
+	publicRoutes.Post("/login", handlers.Login)
 
-	app.Get("/api/v1/items", handlers.GetAllItems)
-	app.Get("/api/v1/items/:id", handlers.GetItemById)
-	app.Post("/api/v1/items", handlers.CreateItem)
-	app.Put("/api/v1/items/:id", handlers.UpdateItem)
-	app.Delete("/api/v1/items", handlers.DeleteItem)
+	// private routes, authentication required
+	var privateRoutes fiber.Router = app.Group("/api/v1", middlewares.CreateMiddleware())
+
+	privateRoutes.Get("/items", handlers.GetAllItems)
+	privateRoutes.Get("/items/:id", handlers.GetItemById)
+	privateRoutes.Post("/items", handlers.CreateItem)
+	privateRoutes.Put("/items/:id", handlers.UpdateItem)
+	privateRoutes.Delete("/items/:id", handlers.DeleteItem)
 }

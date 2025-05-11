@@ -4,10 +4,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/obanlatomiwa/go-inventory-api/models"
 	"github.com/obanlatomiwa/go-inventory-api/services"
+	"github.com/obanlatomiwa/go-inventory-api/utils"
 	"net/http"
 )
 
 func GetAllItems(c *fiber.Ctx) error {
+	// check the token
+	err := validateToken(c)
+	if err != nil {
+		return err
+	}
+
 	var items []models.Item = services.GetAllItems()
 
 	return c.JSON(models.Response[[]models.Item]{
@@ -18,6 +25,12 @@ func GetAllItems(c *fiber.Ctx) error {
 }
 
 func GetItemById(c *fiber.Ctx) error {
+	// check the token
+	err := validateToken(c)
+	if err != nil {
+		return err
+	}
+
 	itemId := c.Params("id")
 	item, err := services.GetItemById(itemId)
 	if err != nil {
@@ -34,6 +47,12 @@ func GetItemById(c *fiber.Ctx) error {
 }
 
 func CreateItem(c *fiber.Ctx) error {
+	// check the token
+	err := validateToken(c)
+	if err != nil {
+		return err
+	}
+
 	var item *models.ItemRequest
 	if err := c.BodyParser(&item); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(models.Response[any]{
@@ -63,6 +82,12 @@ func CreateItem(c *fiber.Ctx) error {
 }
 
 func UpdateItem(c *fiber.Ctx) error {
+	// check the token
+	err := validateToken(c)
+	if err != nil {
+		return err
+	}
+
 	var item *models.ItemRequest
 	if err := c.BodyParser(&item); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(models.Response[any]{
@@ -96,6 +121,12 @@ func UpdateItem(c *fiber.Ctx) error {
 }
 
 func DeleteItem(c *fiber.Ctx) error {
+	// check the token
+	err := validateToken(c)
+	if err != nil {
+		return err
+	}
+
 	itemId := c.Params("id")
 	deleted := services.DeleteItemById(itemId)
 
@@ -110,4 +141,17 @@ func DeleteItem(c *fiber.Ctx) error {
 		Success: false,
 		Message: "Item not found",
 	})
+}
+
+func validateToken(c *fiber.Ctx) error {
+	// check the token
+	isValid, err := utils.CheckToken(c)
+
+	if !isValid {
+		return c.Status(http.StatusUnauthorized).JSON(models.Response[any]{
+			Success: false,
+			Message: err.Error(),
+		})
+	}
+	return nil
 }
