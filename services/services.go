@@ -18,7 +18,11 @@ func GetAllItems() []models.Item {
 
 func GetItemById(id string) (models.Item, error) {
 	var item models.Item
-	database.DB.First(&item, "id = ?", id)
+	result := database.DB.First(&item, "id = ?", id)
+
+	if result.RowsAffected == 0 {
+		return models.Item{}, errors.New("Item not found")
+	}
 	return item, nil
 }
 
@@ -37,19 +41,29 @@ func CreateItem(itemRequest models.ItemRequest) models.Item {
 }
 
 func UpdateItem(itemRequest models.ItemRequest, id string) (models.Item, error) {
+	item, err := GetItemById(id)
 
-	updateItem := models.Item{
-		Name:      itemRequest.Name,
-		Price:     itemRequest.Price,
-		Quantity:  itemRequest.Quantity,
-		UpdatedAt: time.Now(),
+	if err != nil {
+		return models.Item{}, err
 	}
 
-	database.DB.FirstOrCreate(&updateItem, "id = ?", id)
-	return models.Item{}, errors.New("Item update failed, Item not found")
+	item.Name = itemRequest.Name
+	item.Price = itemRequest.Price
+	item.Quantity = itemRequest.Quantity
+	item.UpdatedAt = time.Now()
+
+	database.DB.Save(&item)
+
+	return item, nil
 }
 
 func DeleteItemById(id string) bool {
-	database.DB.Delete(&models.Item{}, "id = ?", id)
+	item, err := GetItemById(id)
+
+	if err != nil {
+		return false
+	}
+
+	database.DB.Delete(item)
 	return true
 }

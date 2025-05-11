@@ -17,7 +17,7 @@ func GetAllItems(c *fiber.Ctx) error {
 
 	var items []models.Item = services.GetAllItems()
 
-	return c.JSON(models.Response[[]models.Item]{
+	return c.Status(http.StatusOK).JSON(models.Response[[]models.Item]{
 		Success: true,
 		Message: "Successfully fetched all items",
 		Data:    items,
@@ -39,7 +39,7 @@ func GetItemById(c *fiber.Ctx) error {
 			Message: err.Error(),
 		})
 	}
-	return c.JSON(models.Response[models.Item]{
+	return c.Status(http.StatusOK).JSON(models.Response[models.Item]{
 		Success: true,
 		Message: "Successfully fetched item",
 		Data:    item,
@@ -113,7 +113,7 @@ func UpdateItem(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(models.Response[models.Item]{
+	return c.Status(http.StatusOK).JSON(models.Response[models.Item]{
 		Success: true,
 		Message: "Successfully updated item",
 		Data:    updatedItem,
@@ -131,7 +131,7 @@ func DeleteItem(c *fiber.Ctx) error {
 	deleted := services.DeleteItemById(itemId)
 
 	if deleted {
-		return c.Status(http.StatusAccepted).JSON(models.Response[any]{
+		return c.Status(http.StatusOK).JSON(models.Response[any]{
 			Success: true,
 			Message: "Successfully deleted item",
 		})
