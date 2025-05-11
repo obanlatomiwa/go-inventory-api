@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"github.com/google/uuid"
+	"github.com/obanlatomiwa/go-inventory-api/database"
 	"github.com/obanlatomiwa/go-inventory-api/models"
 	"time"
 )
@@ -10,16 +11,15 @@ import (
 var storage []models.Item
 
 func GetAllItems() []models.Item {
-	return storage
+	var items []models.Item
+	database.DB.Order("created_at desc").Find(&items)
+	return items
 }
 
 func GetItemById(id string) (models.Item, error) {
-	for _, item := range storage {
-		if item.ID == id {
-			return item, nil
-		}
-	}
-	return models.Item{}, errors.New("Item not found")
+	var item models.Item
+	database.DB.First(&item, "id = ?", id)
+	return item, nil
 }
 
 func CreateItem(itemRequest models.ItemRequest) models.Item {
@@ -31,33 +31,25 @@ func CreateItem(itemRequest models.ItemRequest) models.Item {
 		CreatedAt: time.Now(),
 	}
 
-	storage = append(storage, newItem)
+	database.DB.Create(&newItem)
 
 	return newItem
 }
 
 func UpdateItem(itemRequest models.ItemRequest, id string) (models.Item, error) {
 
-	for index, item := range storage {
-		if item.ID == id {
-			item.Name = itemRequest.Name
-			item.Price = itemRequest.Price
-			item.Quantity = itemRequest.Quantity
-			item.UpdatedAt = time.Now()
-
-			storage[index] = item
-			return item, nil
-		}
+	updateItem := models.Item{
+		Name:      itemRequest.Name,
+		Price:     itemRequest.Price,
+		Quantity:  itemRequest.Quantity,
+		UpdatedAt: time.Now(),
 	}
+
+	database.DB.FirstOrCreate(&updateItem, "id = ?", id)
 	return models.Item{}, errors.New("Item update failed, Item not found")
 }
 
 func DeleteItemById(id string) bool {
-	for index, item := range storage {
-		if item.ID == id {
-			storage = append(storage[:index], storage[index+1:]...)
-			return true
-		}
-	}
-	return false
+	database.DB.Delete(&models.Item{}, "id = ?", id)
+	return true
 }
